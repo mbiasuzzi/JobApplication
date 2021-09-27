@@ -1,8 +1,35 @@
-﻿@{
+﻿@model List<JobApplication.ViewModels.QuestionViewItem>
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+
+    <section id="cover" class="min-vh-100">
+        <div id="cover-caption">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-5 col-lg-6 col-md-8 col-sm-10 mx-auto text-center form p-4">
+                        <h1 class="display-4 py-2">Submit your job application</h1>
+                        <div class="px-2">
+                            <form method="post" action="/home/SaveApplication" class="justify-content-center">
+                                <div class="form-group">
+                                    <label class="sr-only">Name</label>
+
+                                    <input type="text" name="name" id="nameId" class="form-control" placeholder="Name">
+                                </div>
+                                @foreach(var question in Model){
+                                <div class="form-group">
+                                    <label class="sr-only">@question.QuestionText</label>
+
+                                    <input type="text" name="@question.QuestionId" id="@question.QuestionId" class="form-control" placeholder="@question.QuestionText">
+                                </div>
+                                }
+                                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>

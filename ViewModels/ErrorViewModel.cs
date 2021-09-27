@@ -1,6 +1,6 @@
 using System;
 
-namespace JobApplication.Models
+namespace JobApplication.ViewModels
 {
     public class ErrorViewModel
     {

@@ -15,6 +15,7 @@ namespace JobApplication.Models
         public int ApplicationId { get; set; }
         public bool Valid { get; set; }
 
+        public string Name { get; set; }
         public virtual ICollection<ApplicationAnswer> ApplicationAnswers { get; set; }
     }
 }

@@ -67,6 +67,8 @@ namespace JobApplication
                 entity.Property(e => e.ApplicationId).HasColumnName("application_id");
 
                 entity.Property(e => e.Valid).HasColumnName("valid");
+
+                entity.Property(e => e.Name).HasColumnName("name");
             });
 
             modelBuilder.Entity<ApplicationAnswer>(entity =>
