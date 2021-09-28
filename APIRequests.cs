@@ -21,11 +21,11 @@ namespace JobApplication
             string url = string.Empty;
             if (isDevelopment)
             {
-                return "http://localhost:14633/api/";
+                return "http://localhost:14633/api/";  //TODO this needs to go in the config file
             }
             else
             {
-                return "http://jobapplicationv1.azurewebsites.net/api/";
+                return "http://jobapplicationv1.azurewebsites.net/api/";//TODO this needs to go in the config file
             }
         }
         public static async Task<List<QuestionViewItem>> GetQuestionsAsync()

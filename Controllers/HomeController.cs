@@ -23,6 +23,9 @@ namespace JobApplication.Controllers
         {
             _logger = logger;
         }
+        //TODO ADD LOGGIN
+        //TODO ADD TRY CATCHES 
+        //TODO SET UP CONFIG
 
         public virtual async Task<IActionResult> IndexAsync()
         {
