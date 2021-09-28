@@ -56,8 +56,8 @@ namespace JobApplication.Controllers
                 {
                     List<string> validAnswers = context.AnswersTypes
                    .Where(x => x.QuestionId == questionId)
-                   .Select(x => x.ValidAnswer).ToList();
-                    bool valid = validAnswers.Contains(answer);
+                   .Select(x => x.ValidAnswer.ToLower()).ToList();
+                    bool valid = validAnswers.Contains(answer.ToLower());
                     return valid;
                 }
                 else
