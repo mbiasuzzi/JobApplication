@@ -37,13 +37,15 @@ namespace JobApplication.Controllers
         [HttpGet]
         public JsonResult GetValidApplications()
         {
+         
             using (var context = new JobAppSQLDBContext())
             {
 
-                var applications = context.Applications.Where(x => x.Valid == true).Select(x => new { x.Name, x.ApplicationAnswers, x.Valid }).ToList();
+                var applications = context.Applications.Where(x => x.Valid == true)
+                    .Select(x => new { x.Name, x.ApplicationAnswers, x.Valid }).ToList();
                 return new JsonResult(applications);
-            } 
-            
+            }
+
         }
 
         public bool CheckAnswerIsValid(int? questionId, string answer)
@@ -51,19 +53,27 @@ namespace JobApplication.Controllers
            
             using (var context = new JobAppSQLDBContext())
             {
-                var anyValidAnswers = context.AnswersTypes.Where(q => q.QuestionId == questionId).Any();
-                if (anyValidAnswers)
+                try
                 {
-                    List<string> validAnswers = context.AnswersTypes
-                   .Where(x => x.QuestionId == questionId)
-                   .Select(x => x.ValidAnswer.ToLower()).ToList();
-                    bool valid = validAnswers.Contains(answer.ToLower());
-                    return valid;
+                    var anyValidAnswers = context.AnswersTypes.Where(q => q.QuestionId == questionId).Any();
+                    if (anyValidAnswers)
+                    {
+                        List<string> validAnswers = context.AnswersTypes
+                       .Where(x => x.QuestionId == questionId)
+                       .Select(x => x.ValidAnswer.ToLower()).ToList();
+                        bool valid = validAnswers.Contains(answer.ToLower());
+                        return valid;
+                    }
+                    else
+                    {
+                        //if there are no specific valid answers
+                        return true;
+                    }
                 }
-                else
+                catch(Exception ex)
                 {
-                    //if there are no specific valid answers
-                    return true;
+                    //TODO log ex
+                    return false;
                 }
             }
         }
@@ -81,8 +91,8 @@ namespace JobApplication.Controllers
                         applicationIsValid = false;
                     }
                 }
-                await Save(jsonApplication, applicationIsValid);
-                return new JsonResult(true);
+                bool isSucces = await Save(jsonApplication, applicationIsValid);
+                return new JsonResult(isSucces);
             }
             catch(Exception ex)
             {
@@ -94,17 +104,26 @@ namespace JobApplication.Controllers
 
         public async Task<bool> Save(SaveApplicationModel application, bool valid)
         {
-            using (var context = new JobAppSQLDBContext())
+            try
             {
-                context.Applications.Add(new Application
+                using (var context = new JobAppSQLDBContext())
                 {
-                    Valid = valid,
-                    Name = application.Name,
-                    ApplicationAnswers = application.Answers
-                });
-                context.SaveChanges();
-                return true;
+                    context.Applications.Add(new Application
+                    {
+                        Valid = valid,
+                        Name = application.Name,
+                        ApplicationAnswers = application.Answers
+                    });
+                    context.SaveChanges();
+                    return true;
+                }
             }
+            catch(Exception ex)
+            {
+                //TODO log ex
+                return false;
+            }
+           
         }
 
         

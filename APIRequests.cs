@@ -30,50 +30,76 @@ namespace JobApplication
         }
         public static async Task<List<QuestionViewItem>> GetQuestionsAsync()
             {
-                HttpClient client = new HttpClient();
-
-                string url = GetUrl();
-                client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-                List<QuestionViewItem> questions = new List<QuestionViewItem>();
-                HttpResponseMessage response = await client.GetAsync(Routes.GetQuestionsEndpoint);
-                if (response.IsSuccessStatusCode)
+            try
                 {
-                    questions = await response.Content.ReadAsAsync<List<QuestionViewItem>>();
+                    HttpClient client = new HttpClient();
+
+                    string url = GetUrl();
+                    client.BaseAddress = new Uri(url);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json"));
+                    List<QuestionViewItem> questions = new List<QuestionViewItem>();
+                    HttpResponseMessage response = await client.GetAsync(Routes.GetQuestionsEndpoint);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        questions = await response.Content.ReadAsAsync<List<QuestionViewItem>>();
+                    }
+                    return questions;
                 }
-                return questions;
+                catch(Exception ex)
+                {
+                    //TODO log ex
+                    return new List<QuestionViewItem>();
+                }
+               
             }
 
 
         public static async Task<bool> PostApplicationAsync(ApplicationPostModel applicationPostModel)
         {
-            HttpClient client = new HttpClient();
-            string url = GetUrl();
-            client.BaseAddress = new Uri(url);
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var response = await client.PostAsJsonAsync(Routes.SaveApplicationEndpoint,applicationPostModel);
-            return response.IsSuccessStatusCode;
+            try
+            {
+                HttpClient client = new HttpClient();
+                string url = GetUrl();
+                client.BaseAddress = new Uri(url);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var response = await client.PostAsJsonAsync(Routes.SaveApplicationEndpoint, applicationPostModel);
+                return response.IsSuccessStatusCode;
+            }
+            catch(Exception ex)
+            {
+                //TODO log exception
+                return false;
+            }
+            
         }
 
         public static async Task<List<ValidApplication>> GetValidApplications()
         {
-            HttpClient client = new HttpClient();
-            string url = GetUrl();
-            client.BaseAddress = new Uri(url);
-
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
-            List<ValidApplication> applications = new List<ValidApplication>();
-            HttpResponseMessage response = await client.GetAsync(Routes.GetValidApplicationsEndpoint);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                applications = await response.Content.ReadAsAsync<List<ValidApplication>>();
+                HttpClient client = new HttpClient();
+                string url = GetUrl();
+                client.BaseAddress = new Uri(url);
+
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+                List<ValidApplication> applications = new List<ValidApplication>();
+                HttpResponseMessage response = await client.GetAsync(Routes.GetValidApplicationsEndpoint);
+                if (response.IsSuccessStatusCode)
+                {
+                    applications = await response.Content.ReadAsAsync<List<ValidApplication>>();
+                }
+                return applications;
             }
-            return applications;
+            catch (Exception ex)
+            {
+                //TODO log ex
+                return new List<ValidApplication>();
+            }
         }
     }
 

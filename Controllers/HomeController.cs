@@ -28,12 +28,17 @@ namespace JobApplication.Controllers
         //TODO SET UP CONFIG
 
         public virtual async Task<IActionResult> IndexAsync()
-        {
-        
+        {       
             List<QuestionViewItem> questions = await APIRequests.GetQuestionsAsync();
-            return View(questions);
-            
+            if(questions.Count == 0)
+            {
+                return View("Error", new ErrorViewModel());
+            }
+            else
+            {
+                return View(questions);
 
+            }
         }
 
         [HttpPost]
@@ -85,13 +90,13 @@ namespace JobApplication.Controllers
                 dt.Columns.Add(q.QuestionText, typeof(string));
             }
 
-            foreach (ValidApplication ans in applications)
+            foreach (ValidApplication app in applications)
             {
                 DataRow row = dt.NewRow();
-                row[0] = ans.Name;
-                for (int i = 0; i < ans.ApplicationAnswers.Count; i++)
+                row[0] = app.Name;
+                for (int i = 0; i < app.ApplicationAnswers.Count; i++)
                 {
-                    row[i + 1] = ans.ApplicationAnswers[i].Answer;
+                    row[i + 1] = app.ApplicationAnswers[i].Answer;
                 }
                 dt.Rows.Add(row);
             }
