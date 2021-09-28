@@ -26,14 +26,15 @@ namespace JobApplication.Controllers
 
         public virtual async Task<IActionResult> IndexAsync()
         {
-             baseUrl = UriHelper.GetDisplayUrl(Request);
+        
             List<QuestionViewItem> questions = await APIRequests.GetQuestionsAsync();
             return View(questions);
+            
 
         }
 
         [HttpPost]
-        public virtual async Task<HttpStatusCode> SaveApplication(IFormCollection form)
+        public virtual async Task<IActionResult> SaveApplication(IFormCollection form)
         {
             
             ApplicationPostModel applicationPostModel = new ApplicationPostModel();
@@ -55,9 +56,16 @@ namespace JobApplication.Controllers
             }
 
             applicationPostModel.Answers = answerList;
-            await APIRequests.PostApplicationAsync(applicationPostModel);        
-
-            return HttpStatusCode.OK;
+            bool isSuccess = await APIRequests.PostApplicationAsync(applicationPostModel);
+            if (isSuccess)
+            {
+                return View("Success");
+            }
+            else
+            {
+                return View("Error", new ErrorViewModel());
+            }
+          
         }
        
         public virtual async Task<IActionResult> ValidApplications()
@@ -68,12 +76,10 @@ namespace JobApplication.Controllers
            
             DataTable dt = new DataTable();
 
-            List<string> answers = new List<string>();
-
             dt.Columns.Add("Name", typeof(string));
             foreach (QuestionViewItem q in questions)
             {
-                dt.Columns.Add(q.QuestionText,typeof(string));
+                dt.Columns.Add(q.QuestionText, typeof(string));
             }
 
             foreach (ValidApplication ans in applications)
@@ -86,7 +92,7 @@ namespace JobApplication.Controllers
                 }
                 dt.Rows.Add(row);
             }
-           
+
             return View(dt);
         }
 

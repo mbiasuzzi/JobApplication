@@ -47,7 +47,7 @@ namespace JobApplication
             }
 
 
-        public static async Task<string> PostApplicationAsync(ApplicationPostModel applicationPostModel)
+        public static async Task<bool> PostApplicationAsync(ApplicationPostModel applicationPostModel)
         {
             HttpClient client = new HttpClient();
             string url = GetUrl();
@@ -55,8 +55,7 @@ namespace JobApplication
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var response = await client.PostAsJsonAsync(Routes.SaveApplicationEndpoint,applicationPostModel);
-            var headers = response.Content;
-            return "OK";
+            return response.IsSuccessStatusCode;
         }
 
         public static async Task<List<ValidApplication>> GetValidApplications()

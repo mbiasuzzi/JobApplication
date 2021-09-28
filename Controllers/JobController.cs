@@ -69,21 +69,30 @@ namespace JobApplication.Controllers
         }
         [HttpPost]
         [Route("SaveApplication")]
-        public async void SaveApplication(SaveApplicationModel jsonApplication)
+        public async Task<JsonResult> SaveApplication(SaveApplicationModel jsonApplication)
         {
-            bool applicationIsValid = true;
-            foreach (ApplicationAnswer answer in jsonApplication.Answers)
+            try
             {
-                if(!CheckAnswerIsValid(answer.QuestionId, answer.Answer))
+                bool applicationIsValid = true;
+                foreach (ApplicationAnswer answer in jsonApplication.Answers)
                 {
-                    applicationIsValid = false;
+                    if (!CheckAnswerIsValid(answer.QuestionId, answer.Answer))
+                    {
+                        applicationIsValid = false;
+                    }
                 }
+                await Save(jsonApplication, applicationIsValid);
+                return new JsonResult(true);
             }
-            Save(jsonApplication, applicationIsValid);
+            catch(Exception ex)
+            {
+                //Log error
+                return new JsonResult(false);
+            }
             
         }
 
-        public bool Save(SaveApplicationModel application, bool valid)
+        public async Task<bool> Save(SaveApplicationModel application, bool valid)
         {
             using (var context = new JobAppSQLDBContext())
             {
