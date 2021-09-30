@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace JobApplication.Controllers
 {
@@ -94,7 +95,7 @@ namespace JobApplication.Controllers
             }
         }
         [HttpPost]
-        [Route("SaveApplication")]
+        [Route("SaveApplication")] 
         public async Task<JsonResult> SaveApplication(SaveApplicationModel jsonApplication)
         {
             try
@@ -113,7 +114,7 @@ namespace JobApplication.Controllers
             catch(Exception ex)
             {
                 _logger.Log(LogLevel.Error, ex, "Error while trying to save application");
-                return new JsonResult(false);
+                return new JsonResult(ex.Message);
             }
             
         }
