@@ -20,23 +20,22 @@ namespace JobApplication
         }
         private readonly ILogger<APIRequests> _logger;
         private readonly IConfiguration configuration;
-        public APIRequests(ILogger<APIRequests> logger)
+        public APIRequests(ILogger<APIRequests> logger, IConfiguration iConfig)
         {
             _logger = logger;
-        }
-
-        public APIRequests(IConfiguration iConfig)
-        {
             configuration = iConfig;
+
         }
 
         public string GetUrl()
         {
             
             bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-            string url = string.Empty;
+           
             if (isDevelopment)
             {
+                //string url = configuration.GetValue<string>("Enviroment:ApiAddress");
+                //return url;
                 return "http://localhost:14633/api/";  //TODO this needs to go in the config file
             }
             else

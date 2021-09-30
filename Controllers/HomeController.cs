@@ -12,20 +12,23 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+
 
 namespace JobApplication.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger )
         {
             _logger = logger;
+         
         }
 
         //TODO SET UP CONFIG
 
-        public virtual async Task<IActionResult> IndexAsync()
+        public async Task<IActionResult> IndexAsync()
         {
             APIRequests api = new APIRequests();
             List<QuestionViewItem> questions = await api.GetQuestionsAsync();
@@ -40,7 +43,7 @@ namespace JobApplication.Controllers
         }
 
         [HttpPost]
-        public virtual async Task<IActionResult> SaveApplication(IFormCollection form)
+        public async Task<IActionResult> SaveApplication(IFormCollection form)
         {
             
             ApplicationPostModel applicationPostModel = new ApplicationPostModel();
@@ -75,7 +78,7 @@ namespace JobApplication.Controllers
           
         }
        
-        public virtual async Task<IActionResult> ValidApplications()
+        public async Task<IActionResult> ValidApplications()
         {
             APIRequests api = new APIRequests();
             List<ValidApplication> applications = await api.GetValidApplications();
