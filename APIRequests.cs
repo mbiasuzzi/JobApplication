@@ -9,14 +9,30 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace JobApplication
 {
     public class APIRequests
     {
-       
-        public static string GetUrl()
+        public APIRequests()
         {
+        }
+        private readonly ILogger<APIRequests> _logger;
+        private readonly IConfiguration configuration;
+        public APIRequests(ILogger<APIRequests> logger)
+        {
+            _logger = logger;
+        }
+
+        public APIRequests(IConfiguration iConfig)
+        {
+            configuration = iConfig;
+        }
+
+        public string GetUrl()
+        {
+            
             bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
             string url = string.Empty;
             if (isDevelopment)
@@ -28,12 +44,11 @@ namespace JobApplication
                 return "http://jobapplicationv1.azurewebsites.net/api/";//TODO this needs to go in the config file
             }
         }
-        public static async Task<List<QuestionViewItem>> GetQuestionsAsync()
+        public async Task<List<QuestionViewItem>> GetQuestionsAsync()
             {
             try
                 {
                     HttpClient client = new HttpClient();
-
                     string url = GetUrl();
                     client.BaseAddress = new Uri(url);
                     client.DefaultRequestHeaders.Accept.Clear();
@@ -49,14 +64,14 @@ namespace JobApplication
                 }
                 catch(Exception ex)
                 {
-                    //TODO log ex
+                    _logger.Log(LogLevel.Error, ex, "Error getting questions from API");
                     return new List<QuestionViewItem>();
                 }
                
             }
 
 
-        public static async Task<bool> PostApplicationAsync(ApplicationPostModel applicationPostModel)
+        public async Task<bool> PostApplicationAsync(ApplicationPostModel applicationPostModel)
         {
             try
             {
@@ -70,20 +85,19 @@ namespace JobApplication
             }
             catch(Exception ex)
             {
-                //TODO log exception
+                _logger.Log(LogLevel.Error, ex, "Error posting Application to API");
                 return false;
             }
             
         }
 
-        public static async Task<List<ValidApplication>> GetValidApplications()
+        public async Task<List<ValidApplication>> GetValidApplications()
         {
             try
             {
                 HttpClient client = new HttpClient();
                 string url = GetUrl();
                 client.BaseAddress = new Uri(url);
-
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -97,7 +111,7 @@ namespace JobApplication
             }
             catch (Exception ex)
             {
-                //TODO log ex
+                _logger.Log(LogLevel.Error, ex, "Error getting valid applications from API");
                 return new List<ValidApplication>();
             }
         }

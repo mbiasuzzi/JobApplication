@@ -1,5 +1,6 @@
 ﻿using JobApplication.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -24,43 +25,58 @@ namespace JobApplication.Controllers
 
         [Route("GetQuestions")]
         [HttpGet]
-        public JsonResult GetQuestions()
+        public async Task<JsonResult> GetQuestions()
         {
-            using (var context = new JobAppSQLDBContext())
+            try
             {
-                List<Question> questions = context.Questions.Where(x => x.Active == true).ToList();
-                return new JsonResult(questions);
+                using (var context = new JobAppSQLDBContext())
+                {
+                    List<Question> questions = await context.Questions.Where(x => x.Active == true).ToListAsync();
+                    return new JsonResult(questions);
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.Log(LogLevel.Error,ex,"Error getting questions from azure database");
+                return new JsonResult(new List<Question>());
             }
         }
 
         [Route("GetValidApplications")]
         [HttpGet]
-        public JsonResult GetValidApplications()
+        public async Task<JsonResult> GetValidApplications()
         {
-         
-            using (var context = new JobAppSQLDBContext())
+            try
             {
+                using (var context = new JobAppSQLDBContext())
+                {
 
-                var applications = context.Applications.Where(x => x.Valid == true)
-                    .Select(x => new { x.Name, x.ApplicationAnswers, x.Valid }).ToList();
-                return new JsonResult(applications);
+                    var applications = await context.Applications.Where(x => x.Valid == true)
+                        .Select(x => new { x.Name, x.ApplicationAnswers, x.Valid }).ToListAsync();
+                    return new JsonResult(applications);
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.Log(LogLevel.Error, ex, "Error getting valid applications from azure database");
+                return new JsonResult(new List<Application>());
             }
 
         }
 
-        public bool CheckAnswerIsValid(int? questionId, string answer)
+        public async Task<bool> CheckAnswerIsValid(int? questionId, string answer)
         {
            
             using (var context = new JobAppSQLDBContext())
             {
                 try
                 {
-                    var anyValidAnswers = context.AnswersTypes.Where(q => q.QuestionId == questionId).Any();
+                    var anyValidAnswers = await context.AnswersTypes.Where(q => q.QuestionId == questionId).AnyAsync();
                     if (anyValidAnswers)
                     {
-                        List<string> validAnswers = context.AnswersTypes
+                        List<string> validAnswers = await context.AnswersTypes
                        .Where(x => x.QuestionId == questionId)
-                       .Select(x => x.ValidAnswer.ToLower()).ToList();
+                       .Select(x => x.ValidAnswer.ToLower()).ToListAsync();
                         bool valid = validAnswers.Contains(answer.ToLower());
                         return valid;
                     }
@@ -72,7 +88,7 @@ namespace JobApplication.Controllers
                 }
                 catch(Exception ex)
                 {
-                    //TODO log ex
+                    _logger.Log(LogLevel.Error, ex, "Error checking valid answers from azure database");
                     return false;
                 }
             }
@@ -86,7 +102,7 @@ namespace JobApplication.Controllers
                 bool applicationIsValid = true;
                 foreach (ApplicationAnswer answer in jsonApplication.Answers)
                 {
-                    if (!CheckAnswerIsValid(answer.QuestionId, answer.Answer))
+                    if (await CheckAnswerIsValid(answer.QuestionId, answer.Answer) == false)
                     {
                         applicationIsValid = false;
                     }
@@ -96,7 +112,7 @@ namespace JobApplication.Controllers
             }
             catch(Exception ex)
             {
-                //Log error
+                _logger.Log(LogLevel.Error, ex, "Error while trying to save application");
                 return new JsonResult(false);
             }
             
@@ -114,13 +130,13 @@ namespace JobApplication.Controllers
                         Name = application.Name,
                         ApplicationAnswers = application.Answers
                     });
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                     return true;
                 }
             }
             catch(Exception ex)
             {
-                //TODO log ex
+                _logger.Log(LogLevel.Error, ex, "Error saving application to azure database");
                 return false;
             }
            

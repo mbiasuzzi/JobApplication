@@ -18,18 +18,17 @@ namespace JobApplication.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        public string baseUrl;
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
         }
-        //TODO ADD LOGGIN
-        //TODO ADD TRY CATCHES 
+
         //TODO SET UP CONFIG
 
         public virtual async Task<IActionResult> IndexAsync()
-        {       
-            List<QuestionViewItem> questions = await APIRequests.GetQuestionsAsync();
+        {
+            APIRequests api = new APIRequests();
+            List<QuestionViewItem> questions = await api.GetQuestionsAsync();
             if(questions.Count == 0)
             {
                 return View("Error", new ErrorViewModel());
@@ -37,7 +36,6 @@ namespace JobApplication.Controllers
             else
             {
                 return View(questions);
-
             }
         }
 
@@ -64,7 +62,8 @@ namespace JobApplication.Controllers
             }
 
             applicationPostModel.Answers = answerList;
-            bool isSuccess = await APIRequests.PostApplicationAsync(applicationPostModel);
+            APIRequests api = new APIRequests();
+            bool isSuccess = await api.PostApplicationAsync(applicationPostModel);
             if (isSuccess)
             {
                 return View("Success");
@@ -78,9 +77,13 @@ namespace JobApplication.Controllers
        
         public virtual async Task<IActionResult> ValidApplications()
         {
-          
-            List<ValidApplication> applications = await APIRequests.GetValidApplications();
-            List<QuestionViewItem> questions = await APIRequests.GetQuestionsAsync();
+            APIRequests api = new APIRequests();
+            List<ValidApplication> applications = await api.GetValidApplications();
+            List<QuestionViewItem> questions = await api.GetQuestionsAsync();
+            if(questions.Count == 0)
+            {
+                return View("Error", new ErrorViewModel());
+            }
            
             DataTable dt = new DataTable();
 
